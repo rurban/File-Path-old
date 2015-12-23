@@ -18,7 +18,9 @@ BEGIN {
 
 use Exporter ();
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
-$VERSION   = '2.16';
+$VERSION   = '3.16_01c';
+$VERSION   =~ tr/_//d;
+$VERSION   =~ s/c$//;
 $VERSION   = eval $VERSION;
 @ISA       = qw(Exporter);
 @EXPORT    = qw(mkpath rmtree);
@@ -51,12 +53,8 @@ sub _croak {
     goto &Carp::croak;
 }
 
-sub _error {
-    my $arg     = shift;
-    my $message = shift;
-    my $object  = shift;
-
-    if ( $arg->{error} ) {
+sub _error ($arg, str $message, $object?) {
+    if ($arg->{error}) {
         $object = '' unless defined $object;
         $message .= ": $!" if $!;
         push @{ ${ $arg->{error} } }, { $object => $message };
@@ -173,9 +171,7 @@ sub mkpath {
     return _mkpath( $data, $paths );
 }
 
-sub _mkpath {
-    my $data   = shift;
-    my $paths = shift;
+sub _mkpath ($data, $paths) {
 
     my ( @created );
     foreach my $path ( @{$paths} ) {
@@ -249,8 +245,7 @@ sub remove_tree {
     goto &rmtree;
 }
 
-sub _is_subdir {
-    my ( $dir, $test ) = @_;
+sub _is_subdir (str $dir, str $test) {
 
     my ( $dv, $dd ) = File::Spec->splitpath( $dir,  1 );
     my ( $tv, $td ) = File::Spec->splitpath( $test, 1 );
@@ -366,9 +361,7 @@ sub rmtree {
     return _rmtree( $data, \@clean_path );
 }
 
-sub _rmtree {
-    my $data   = shift;
-    my $paths = shift;
+sub _rmtree ($data, $paths) {
 
     my $count  = 0;
     my $curdir = File::Spec->curdir();
@@ -614,11 +607,9 @@ sub _rmtree {
     return $count;
 }
 
-sub _slash_lc {
-
+sub _slash_lc (str $path) {
     # fix up slashes and case on MSWin32 so that we can determine that
     # c:\path\to\dir is underneath C:/Path/To
-    my $path = shift;
     $path =~ tr{\\}{/};
     return lc($path);
 }
@@ -1236,6 +1227,8 @@ are greatly appreciated.
 Gisle Aas made a number of improvements to the documentation for
 2.07 and his advice and assistance is also greatly appreciated.
 
+Reini Urban modernized it for cperl, bumping its major version +1.
+
 =head1 AUTHORS
 
 Prior authors and maintainers: Tim Bunce, Charles Bailey, and
@@ -1261,6 +1254,8 @@ Contributors to File::Path, in alphabetical order by first name.
 =item John Lightsey <F<john@perlsec.org>>
 
 =item Nigel Horne <F<njh@bandsman.co.uk>>
+
+=item Reini Urban <F<rurban@cpan.org>>
 
 =item Richard Elberger <F<riche@cpan.org>>
 
